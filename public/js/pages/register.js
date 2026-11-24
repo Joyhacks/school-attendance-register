@@ -4,7 +4,8 @@ import { api } from '../lib/api.js';
 import { $, h, mount } from '../lib/dom.js';
 import { STATUS_LABELS, formatDate, periodLabel, plural } from '../lib/format.js';
 import { getParam, initPage } from '../lib/shell.js';
-import { buildField, showEmpty, showError, showLoading, toast, withBusy } from '../lib/ui.js';
+import { icon } from '../lib/icons.js';
+import { asSearchField, avatar, button, buildField, showEmpty, showError, showLoading, toast, withBusy } from '../lib/ui.js';
 
 await initPage({ active: 'courses' });
 
@@ -47,17 +48,18 @@ async function load() {
   }
 
   document.title = `${course.code} register | Attendance Register`;
-  $('#back-link').textContent = `Back to ${course.code}`;
+  $('#back-link').replaceChildren(icon('back', { size: 16 }), `${course.code} ${course.title}`);
   $('#back-link').href = `/course?id=${course.id}`;
-  $('#register-title').textContent = `${course.code} register`;
-  $('#register-meta').textContent =
-    `${formatDate(session.date)}, ${periodLabel(session.period)}.${session.topic ? ` Topic: ${session.topic}.` : ''}`;
+  $('#register-eyebrow').textContent = `${course.code} class register`;
+  $('#register-title').textContent = formatDate(session.date);
+  $('#register-meta').textContent = `${periodLabel(session.period)}${session.topic ? `. Topic: ${session.topic}` : ''}. ${plural(register.length, 'student')} on the register.`;
 
   if (register.length === 0) {
     showEmpty(content, {
+      iconName: 'students',
       title: 'Nobody is in this course yet',
       text: 'Add students to the course first. They will then appear on this register.',
-      action: h('a', { class: 'btn btn--primary', href: `/course?id=${course.id}&tab=students` }, 'Add students'),
+      action: button('Add students', { icon: 'userPlus', href: `/course?id=${course.id}&tab=students` }),
     });
     return;
   }
@@ -97,8 +99,10 @@ function render() {
     const el = h(
       'li',
       { class: 'register__row' },
-      h('span', { class: 'register__no', 'aria-hidden': 'true' }, index + 1),
-      h('div', {}, h('div', { class: 'register__name' }, row.fullName), h('div', { class: 'register__matric' }, row.matricNo)),
+      h('div', { class: 'register__who' },
+        h('span', { class: 'register__no', 'aria-hidden': 'true' }, index + 1),
+        avatar(row.fullName),
+        h('div', {}, h('div', { class: 'register__name' }, row.fullName), h('div', { class: 'register__matric' }, row.matricNo))),
       markControl(row),
     );
     return { row, el, haystack: `${row.fullName} ${row.matricNo}`.toLowerCase() };
@@ -106,7 +110,7 @@ function render() {
   list.append(...rows.map((r) => r.el));
 
   const search = buildField({ name: 'find', label: 'Find a student', required: false, plainLabel: true, placeholder: 'Name or matric number…' });
-  search.control.type = 'search';
+  asSearchField(search);
   search.control.addEventListener('input', () => {
     const term = search.control.value.trim().toLowerCase();
     let shown = 0;
@@ -118,11 +122,9 @@ function render() {
     noMatch.hidden = shown > 0;
   });
 
-  const markRest = h(
-    'button',
-    {
-      class: 'btn btn--secondary',
-      type: 'button',
+  const markRest = button('Mark the rest present', {
+      icon: 'listChecks',
+      variant: 'secondary',
       onclick: () => {
         let changed = 0;
         for (const { row, el } of rows) {
@@ -134,13 +136,11 @@ function render() {
         updateTally();
         toast(changed ? `${plural(changed, 'student')} marked present. Now change the ones who are not here.` : 'Everyone already has a mark.');
       },
-    },
-    'Mark the rest present',
-  );
+  });
 
   tallyEl = h('dl', { class: 'tally', 'aria-label': 'Tally' });
   saveNote = h('span', { class: 'save-bar__note', role: 'status' });
-  const saveButton = h('button', { class: 'btn btn--primary', type: 'button', onclick: () => save(saveButton) }, 'Save register');
+  const saveButton = button('Save register', { icon: 'save', onclick: () => save(saveButton) });
 
   mount(
     content,
@@ -164,14 +164,14 @@ function updateTally() {
   saveNote.textContent = isDirty() ? 'Not saved yet' : '';
 }
 
-async function save(button) {
+async function save(saveBtn) {
   const records = [...marks].map(([studentId, status]) => ({ studentId, status }));
   if (records.length === 0) {
     toast('Mark at least one student before saving.', { error: true });
     return;
   }
   try {
-    await withBusy(button, 'Saving', () => api(`/sessions/${sessionId}/attendance`, { method: 'PUT', body: { records } }));
+    await withBusy(saveBtn, 'Saving', () => api(`/sessions/${sessionId}/attendance`, { method: 'PUT', body: { records } }));
     for (const [studentId, status] of marks) saved.set(studentId, status);
     updateTally();
     const unmarked = register.length - marks.size;

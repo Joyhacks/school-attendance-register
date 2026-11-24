@@ -10,16 +10,25 @@ Mode: product (an internal tool). Depth: quick pass. Not yet reviewed against re
 
 ## Tokens (public/css/tokens.css)
 
-- Brand: Best Solution Polytechnic, Akure. Green #2a7d2e for actions, deep green #123a17 for the sidebar, taken from bestpotech.edu.ng.
-- Canvas #f2f5f1, surface #ffffff, ink #151a17. Neutrals are tinted green, no pure black or flat grey.
-- Mark colours: present #1a7442, absent #b42318, late #875400, excused #46546a. Every mark also carries its word, never colour alone.
-- Type: Montserrat 700 for headings (the school site's display face), Atkinson Hyperlegible Next for everything else because matric numbers need 0/O and 1/l told apart. Both bundled locally.
-- The school crest is not used. A public deploy carries a "student project" note so nobody mistakes it for an official school system.
-- Spacing on an 8px scale. Radius 6px for controls, 10px for panels. Edges, no shadows.
+Measured from bestpotech.edu.ng on 24 Nov 2026:
+- Green #2a7d2e (actions, active nav), deep green #0f3d16 (sidebar, portal panel), #1a5020 (strong text on light green), bright #16cb00 (the 56x3px rule under headings).
+- Gold #f59e0b on dark, #b45309 for small text on light (section eyebrows, the active-nav marker).
+- Slate text: headings #0f172a, body #374151, secondary #576173 (darkened from the site's #64748b to pass 4.5:1 on the page background). Borders #e2e8f0.
+- Montserrat 600/700 for headings, buttons, tabs and table headers (uppercase, tracked, like the site's nav and buttons). Roboto 400/500/700 for everything else.
+- 4px control radius, 8px panels, one light shadow.
+- Mark colours: present #1f7a33, absent #c0392b, late #b45309, excused #475569. Every mark also carries its word.
+
+## Patterns taken from the school site
+
+- Gold uppercase eyebrow, Montserrat title, short bright-green rule: every page header.
+- Uppercase Montserrat buttons with a leading icon.
+- Progress bars like the site's "Practical Knowledge 95%" bars: attendance rates.
+- Crest beside the school name in green; motto in italics.
 
 ## Do not
 
-- No gradients, glows, shadows, icon tiles or card grids.
-- No second accent colour. Red is only for absent, below-minimum and destructive actions.
-- No inline styles or inline scripts (the Content Security Policy blocks them).
+- No gradients, glows, glass or decorative blobs.
+- Red only for absent, below-minimum and destructive actions. Gold only for labels, the low-attendance bar and the minimum line.
+- No inline styles or inline scripts (the Content Security Policy blocks them). Widths set from JS go through element.style.
 - Tables keep the stacked layout on phones. Do not shrink them.
+- Keep the project note on every page while the crest is used.

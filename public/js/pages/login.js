@@ -1,5 +1,7 @@
 import { api } from '../lib/api.js';
 import { $, h } from '../lib/dom.js';
+import { icon } from '../lib/icons.js';
+import { fillSchoolPanel } from '../lib/portal.js';
 import { buildField, submitFields } from '../lib/ui.js';
 
 // Only follow "next" when it is a path on this site. Stops a crafted
@@ -10,19 +12,7 @@ function nextPath() {
 }
 
 async function start() {
-  try {
-    const meta = await api('/meta');
-    $('#school-name').textContent = meta.schoolName;
-    document.title = `Sign in | ${meta.schoolName} Attendance Register`;
-    for (const [id, text] of [['#school-motto', meta.schoolMotto], ['#project-note', meta.projectNote]]) {
-      if (text) {
-        $(id).textContent = text;
-        $(id).hidden = false;
-      }
-    }
-  } catch {
-    // The page still works without the school name.
-  }
+  await fillSchoolPanel('Sign in');
 
   // A fresh install has no admin yet: send the visitor to setup.
   try {
@@ -50,7 +40,7 @@ async function start() {
     buildField({ name: 'password', label: 'Password', type: 'password', autocomplete: 'current-password' }),
   ];
   const formError = h('p', { class: 'form-error', role: 'alert', hidden: true });
-  const button = h('button', { class: 'btn btn--primary', type: 'submit' }, 'Sign in');
+  const button = h('button', { class: 'btn btn--primary btn--block', type: 'submit' }, icon('login'), 'Sign in');
 
   const form = h(
     'form',

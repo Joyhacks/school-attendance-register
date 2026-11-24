@@ -3,14 +3,14 @@ import { $, h, mount } from '../lib/dom.js';
 import { formatDate } from '../lib/format.js';
 import { initPage } from '../lib/shell.js';
 import { openCourseForm } from '../lib/courseForm.js';
-import { buildTable, confirmDialog, loadInto, showEmpty, toast } from '../lib/ui.js';
+import { button, buildTable, confirmDialog, courseCell, loadInto, rateBar, showEmpty, toast } from '../lib/ui.js';
 
 const user = await initPage({ active: 'courses' });
 const isAdmin = user.role === 'admin';
 const content = $('#content');
 
 if (isAdmin) {
-  mount($('#page-actions'), h('button', { class: 'btn btn--primary', type: 'button', onclick: () => openCourseForm(null, load) }, 'Add course'));
+  mount($('#page-actions'), button('Add course', { icon: 'plus', onclick: () => openCourseForm(null, load) }));
 }
 
 function load() {
@@ -38,20 +38,22 @@ function render({ courses }) {
   if (courses.length === 0) {
     showEmpty(content, isAdmin
       ? {
+          iconName: 'courses',
           title: 'No courses yet',
           text: 'Add a course, assign a lecturer and put students in it. After that the lecturer can mark the register.',
-          action: h('button', { class: 'btn btn--primary', type: 'button', onclick: () => openCourseForm(null, load) }, 'Add course'),
+          action: button('Add course', { icon: 'plus', onclick: () => openCourseForm(null, load) }),
         }
-      : { title: 'No courses are assigned to you yet', text: 'Ask an admin to assign your courses.' });
+      : { iconName: 'courses', title: 'No courses are assigned to you yet', text: 'Ask an administrator to assign your courses.' });
     return;
   }
 
   const columns = [
-    { label: 'Course', primary: true, cell: (c) => h('a', { href: `/course?id=${c.id}` }, `${c.code} ${c.title}`) },
-    { label: 'Lecturer', cell: (c) => c.lecturerName || 'Not assigned' },
+    { label: 'Course', primary: true, cell: (c) => courseCell(c) },
+    { label: 'Lecturer', cell: (c) => c.lecturerName || h('span', { class: 'muted' }, 'Not assigned') },
     { label: 'Students', numeric: true, cell: (c) => c.studentCount },
-    { label: 'Classes held', numeric: true, cell: (c) => c.sessionCount },
-    { label: 'Last class', cell: (c) => (c.lastSessionDate ? formatDate(c.lastSessionDate) : 'None yet') },
+    { label: 'Classes', numeric: true, cell: (c) => c.sessionCount },
+    { label: 'Attendance', cell: (c) => rateBar(c.attendanceRate, c.minAttendance) },
+    { label: 'Last class', cell: (c) => h('span', { class: 'nowrap' }, c.lastSessionDate ? formatDate(c.lastSessionDate) : 'None yet') },
   ];
   if (isAdmin) {
     columns.push({

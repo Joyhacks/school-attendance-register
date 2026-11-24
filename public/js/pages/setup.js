@@ -2,15 +2,11 @@
 // if ticked, the demo data. The setup code is in the server log.
 import { api } from '../lib/api.js';
 import { $, h, mount } from '../lib/dom.js';
+import { fillSchoolPanel } from '../lib/portal.js';
 import { buildField, submitFields } from '../lib/ui.js';
 
 async function start() {
-  try {
-    const meta = await api('/meta');
-    $('#school-name').textContent = meta.schoolName;
-  } catch {
-    // The page still works without the school name.
-  }
+  await fillSchoolPanel('Set up');
 
   const { needsSetup } = await api('/setup/status');
   if (!needsSetup) {
@@ -26,7 +22,7 @@ async function start() {
   ];
   const demo = h('input', { type: 'checkbox', id: 'demo-data', checked: true });
   const formError = h('p', { class: 'form-error', role: 'alert', hidden: true });
-  const button = h('button', { class: 'btn btn--primary', type: 'submit' }, 'Create admin account');
+  const button = h('button', { class: 'btn btn--primary btn--block', type: 'submit' }, 'Create admin account');
 
   const form = h(
     'form',
@@ -72,7 +68,7 @@ function showDone({ demo }) {
               h('dt', {}, 'Password'), h('dd', { class: 'num' }, demo.password)),
           )
         : null,
-      h('a', { class: 'btn btn--primary', href: '/' }, 'Go to sign in'),
+      h('a', { class: 'btn btn--primary btn--block', href: '/' }, 'Go to sign in'),
     ),
   );
 }

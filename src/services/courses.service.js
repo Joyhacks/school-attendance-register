@@ -6,7 +6,11 @@ const COURSE_SELECT = `
          u.full_name AS lecturer_name,
          (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id) AS student_count,
          (SELECT COUNT(*) FROM class_sessions cs WHERE cs.course_id = c.id) AS session_count,
-         (SELECT MAX(cs.session_date) FROM class_sessions cs WHERE cs.course_id = c.id) AS last_session_date
+         (SELECT MAX(cs.session_date) FROM class_sessions cs WHERE cs.course_id = c.id) AS last_session_date,
+         (SELECT COUNT(*) FROM attendance_records ar JOIN class_sessions cs ON cs.id = ar.session_id
+            WHERE cs.course_id = c.id AND ar.status IN ('present', 'late')) AS attended_marks,
+         (SELECT COUNT(*) FROM attendance_records ar JOIN class_sessions cs ON cs.id = ar.session_id
+            WHERE cs.course_id = c.id AND ar.status = 'excused') AS excused_marks
   FROM courses c
   LEFT JOIN users u ON u.id = c.lecturer_id`;
 
@@ -21,7 +25,16 @@ function toCourse(row) {
     studentCount: row.student_count,
     sessionCount: row.session_count,
     lastSessionDate: row.last_session_date,
+    attendanceRate: courseRate(row),
   };
+}
+
+// Share of possible attendances that happened: every enrolled student
+// at every class, minus excused ones. Unmarked counts as absent.
+function courseRate(row) {
+  const possible = row.session_count * row.student_count - row.excused_marks;
+  if (possible <= 0) return null;
+  return Math.round((row.attended_marks / possible) * 1000) / 10;
 }
 
 const duplicateCode = () =>

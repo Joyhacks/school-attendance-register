@@ -1,18 +1,19 @@
 // The frame around every signed-in page: checks who is signed in,
-// then builds the header and navigation for their role.
+// then builds the school header and navigation for their role.
 import { api } from './api.js';
 import { h } from './dom.js';
-import { toast } from './ui.js';
+import { icon } from './icons.js';
+import { avatar, toast } from './ui.js';
 
 const NAV = [
-  { href: '/dashboard', label: 'Dashboard', key: 'dashboard' },
-  { href: '/courses', label: 'Courses', key: 'courses' },
-  { href: '/students', label: 'Students', key: 'students' },
-  { href: '/staff', label: 'Staff accounts', key: 'staff', adminOnly: true },
-  { href: '/account', label: 'My account', key: 'account' },
+  { href: '/dashboard', label: 'Dashboard', key: 'dashboard', icon: 'dashboard' },
+  { href: '/courses', label: 'Courses', key: 'courses', icon: 'courses' },
+  { href: '/students', label: 'Students', key: 'students', icon: 'students' },
+  { href: '/staff', label: 'Staff accounts', key: 'staff', icon: 'staff', adminOnly: true },
+  { href: '/account', label: 'My account', key: 'account', icon: 'account' },
 ];
 
-const ROLE_LABELS = { admin: 'Admin', lecturer: 'Lecturer' };
+const ROLE_LABELS = { admin: 'Administrator', lecturer: 'Lecturer' };
 
 // Call at the top of every page script. Returns the signed-in user.
 // If nobody is signed in, api() sends the browser to the sign-in page.
@@ -31,24 +32,31 @@ export async function initPage({ active, adminOnly = false }) {
       type: 'button',
       'aria-expanded': 'false',
       'aria-controls': 'app-nav',
+      'aria-label': 'Menu',
       onclick: () => {
         const open = nav.classList.toggle('is-open');
         toggle.setAttribute('aria-expanded', String(open));
+        toggle.replaceChildren(icon(open ? 'close' : 'menu'));
       },
     },
-    'Menu',
+    icon('menu'),
   );
 
   nav.append(
+    h('p', { class: 'app-nav__label' }, 'Menu'),
     h('ul', {}, NAV.filter((item) => !item.adminOnly || user.role === 'admin').map((item) =>
-      h('li', {}, h('a', { href: item.href, 'aria-current': item.key === active ? 'page' : null }, item.label)),
+      h('li', {}, h('a', { href: item.href, 'aria-current': item.key === active ? 'page' : null }, icon(item.icon), item.label)),
     )),
     h(
       'div',
       { class: 'app-user' },
-      h('div', { class: 'app-user__name' }, user.fullName),
-      h('div', { class: 'app-user__role' }, ROLE_LABELS[user.role]),
-      h('button', { type: 'button', onclick: signOut }, 'Sign out'),
+      h(
+        'div',
+        { class: 'app-user__row' },
+        avatar(user.fullName, 'deep'),
+        h('div', { class: 'app-user__text' }, h('div', { class: 'app-user__name' }, user.fullName), h('div', { class: 'app-user__role' }, ROLE_LABELS[user.role])),
+        h('button', { class: 'signout', type: 'button', 'aria-label': 'Sign out', title: 'Sign out', onclick: signOut }, icon('logout')),
+      ),
       meta.projectNote ? h('p', { class: 'project-note' }, meta.projectNote) : null,
     ),
   );
@@ -59,9 +67,12 @@ export async function initPage({ active, adminOnly = false }) {
     h(
       'div',
       { class: 'app-header__bar' },
-      h('a', { class: 'brand', href: '/dashboard' },
-        h('span', { class: 'brand__school', translate: 'no' }, meta.schoolName),
-        h('span', { class: 'brand__name' }, 'Attendance Register')),
+      h(
+        'a',
+        { class: 'brand', href: '/dashboard' },
+        h('img', { class: 'brand__crest', src: '/img/crest-96.png', alt: '', width: 44, height: 44 }),
+        h('span', { class: 'brand__text' }, h('span', { class: 'brand__school', translate: 'no' }, meta.schoolName), h('span', { class: 'brand__name' }, 'Attendance Register')),
+      ),
       toggle,
     ),
     nav,

@@ -4,26 +4,39 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Sign in | Attendance Register</title>
-  <link rel="preload" href="/fonts/atkinson-hyperlegible-next-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/roboto-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/montserrat-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="icon" href="/img/favicon-64.png" type="image/png">
   <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/components.css">
   <script type="module" src="/js/pages/login.js"></script>
 </head>
 <body>
-  <main class="signin">
-    <div class="signin__box">
-      <div class="signin__head">
-        <p class="signin__school" id="school-name" translate="no">&nbsp;</p>
-        <p class="signin__motto" id="school-motto" hidden></p>
-        <h1>Attendance Register</h1>
-        <p class="project-note" id="project-note" hidden></p>
+  <div class="portal">
+    <aside class="portal__school" aria-label="School">
+      <img class="portal__crest" src="/img/crest-256.png" alt="" width="120" height="120">
+      <div>
+        <p class="portal__name" id="school-name" translate="no">&nbsp;</p>
+        <p class="portal__motto" id="school-motto" hidden></p>
       </div>
-      <div id="signin-form"></div>
-      <p class="signin__note">Forgot your password? Ask an admin to reset it for you.</p>
-      <noscript><p>This system needs JavaScript. Turn it on in your browser settings and reload the page.</p></noscript>
-    </div>
-  </main>
+      <div class="portal__intro">
+        <strong>Attendance Register</strong>
+        Lecturers mark the class register on a phone or laptop. The system works out each student's attendance and flags anyone below the course minimum.
+      </div>
+      <p class="portal__address" id="school-address" hidden></p>
+    </aside>
+    <main class="portal__main" id="main">
+      <div class="portal__card">
+        <p class="eyebrow">Staff portal</p>
+        <h1>Sign in</h1>
+        <p class="portal__lead">Use the email and password your administrator gave you.</p>
+        <div id="signin-form"></div>
+        <p class="portal__help">Forgot your password? Ask an administrator to reset it for you.</p>
+        <p class="project-note" id="project-note" hidden></p>
+        <noscript><p>This system needs JavaScript. Turn it on in your browser settings and reload the page.</p></noscript>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

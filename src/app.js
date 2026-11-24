@@ -87,7 +87,12 @@ export function createApp({ pool, config }) {
   });
 
   api.get('/meta', (req, res) =>
-    res.json({ schoolName: config.schoolName, schoolMotto: config.schoolMotto || '', projectNote: config.projectNote || '' }),
+    res.json({
+      schoolName: config.schoolName,
+      schoolMotto: config.schoolMotto || '',
+      schoolAddress: config.schoolAddress || '',
+      projectNote: config.projectNote || '',
+    }),
   );
   api.use('/auth', authRoutes({ users, requireAuth }));
   api.use('/setup', setupRoutes({ setup }));

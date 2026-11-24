@@ -1,8 +1,9 @@
 import { api } from '../lib/api.js';
 import { $, h, mount } from '../lib/dom.js';
-import { formatPercent, plural } from '../lib/format.js';
+import { plural } from '../lib/format.js';
 import { getParam, initPage, setParams } from '../lib/shell.js';
-import { buildField, buildTable, confirmDialog, formDialog, infoDialog, showEmpty, showError, showLoading, toast } from '../lib/ui.js';
+import { icon } from '../lib/icons.js';
+import { asSearchField, button, buildField, buildTable, confirmDialog, formDialog, infoDialog, person, rateBar, showEmpty, showError, showLoading, toast } from '../lib/ui.js';
 
 const user = await initPage({ active: 'students' });
 const isAdmin = user.role === 'admin';
@@ -12,15 +13,15 @@ let filterOptions = { departments: [], levels: [] };
 if (isAdmin) {
   mount(
     $('#page-actions'),
-    h('button', { class: 'btn btn--secondary', type: 'button', onclick: openImport }, 'Import a list'),
-    h('button', { class: 'btn btn--primary', type: 'button', onclick: () => openStudentForm() }, 'Add student'),
+    button('Import a list', { icon: 'upload', variant: 'secondary', onclick: openImport }),
+    button('Add student', { icon: 'userPlus', onclick: () => openStudentForm() }),
   );
 }
 
 // ---------- Search and filters (kept in the address bar) ----------
 
 const search = buildField({ name: 'search', label: 'Find a student', required: false, plainLabel: true, value: getParam('search'), placeholder: 'Name or matric number…' });
-search.control.type = 'search';
+asSearchField(search);
 const department = h('select', { class: 'select', id: 'filter-department' });
 const level = h('select', { class: 'select', id: 'filter-level' });
 
@@ -87,14 +88,15 @@ function render({ students, total, page, pageCount }) {
   const filtered = Boolean(getParam('search') || getParam('department') || getParam('level'));
   if (total === 0) {
     showEmpty(results, filtered
-      ? { title: 'No student matches', text: 'Check the spelling or clear the filters.' }
+      ? { iconName: 'search', title: 'No student matches', text: 'Check the spelling or clear the filters.' }
       : isAdmin
         ? {
+            iconName: 'students',
             title: 'No students yet',
             text: 'Add students one at a time, or paste a whole class list with Import a list.',
-            action: h('button', { class: 'btn btn--primary', type: 'button', onclick: openImport }, 'Import a list'),
+            action: button('Import a list', { icon: 'upload', onclick: openImport }),
           }
-        : { title: 'No students yet', text: 'An admin adds students. They will show up here once that is done.' });
+        : { iconName: 'students', title: 'No students yet', text: 'An administrator adds students. They will show up here once that is done.' });
     return;
   }
 
@@ -102,9 +104,8 @@ function render({ students, total, page, pageCount }) {
     {
       label: 'Name',
       primary: true,
-      cell: (s) => h('button', { class: 'btn btn--quiet name-button', type: 'button', onclick: () => openAttendance(s) }, s.fullName),
+      cell: (s) => h('button', { class: 'btn btn--quiet name-button', type: 'button', onclick: () => openAttendance(s), 'aria-label': `${s.fullName}, see attendance` }, person(s.fullName, s.matricNo)),
     },
-    { label: 'Matric number', cell: (s) => h('span', { class: 'num' }, s.matricNo) },
     { label: 'Department', cell: (s) => s.department },
     { label: 'Level', cell: (s) => s.level },
   ];
@@ -113,8 +114,8 @@ function render({ students, total, page, pageCount }) {
       label: 'Actions',
       actions: true,
       cell: (s) => [
-        h('button', { class: 'btn btn--quiet', type: 'button', 'aria-label': `Edit ${s.fullName}`, onclick: () => openStudentForm(s) }, 'Edit'),
-        h('button', { class: 'btn btn--quiet btn--danger-text', type: 'button', 'aria-label': `Delete ${s.fullName}`, onclick: () => deleteStudent(s) }, 'Delete'),
+        button('Edit', { variant: 'quiet', ariaLabel: `Edit ${s.fullName}`, onclick: () => openStudentForm(s) }),
+        button('Delete', { variant: 'quiet btn--danger-text', ariaLabel: `Delete ${s.fullName}`, onclick: () => deleteStudent(s) }),
       ],
     });
   }
@@ -136,8 +137,8 @@ function render({ students, total, page, pageCount }) {
         ? h(
             'div',
             { class: 'pagination__buttons' },
-            h('button', { class: 'btn btn--secondary', type: 'button', disabled: page <= 1, onclick: () => goTo(page - 1) }, 'Previous'),
-            h('button', { class: 'btn btn--secondary', type: 'button', disabled: page >= pageCount, onclick: () => goTo(page + 1) }, 'Next'),
+            h('button', { class: 'btn btn--secondary', type: 'button', disabled: page <= 1, onclick: () => goTo(page - 1) }, icon('prev'), 'Previous'),
+            h('button', { class: 'btn btn--secondary', type: 'button', disabled: page >= pageCount, onclick: () => goTo(page + 1) }, 'Next', icon('next')),
           )
         : null,
     ),
@@ -257,7 +258,7 @@ async function openAttendance(student) {
         columns: [
           { label: 'Course', primary: true, cell: (c) => h('a', { href: `/course?id=${c.courseId}&tab=report` }, c.code) },
           { label: 'Attended', numeric: true, cell: (c) => `${c.present + c.late} of ${c.held - c.excused}` },
-          { label: 'Attendance', numeric: true, cell: (c) => formatPercent(c.percent) },
+          { label: 'Attendance', cell: (c) => rateBar(c.percent, c.minAttendance) },
           { label: 'Standing', cell: (c) => standing[c.standing].cloneNode(true) },
         ],
         rows: data.courses,

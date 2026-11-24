@@ -54,6 +54,8 @@ export const env = Object.freeze({
   schoolName: process.env.SCHOOL_NAME || 'My School',
   // Optional. Shown under the school name on the sign-in page.
   schoolMotto: process.env.SCHOOL_MOTTO || '',
+  // Optional. Shown on the sign-in page, for example "Km 12, Ondo Road, Akure".
+  schoolAddress: process.env.SCHOOL_ADDRESS || '',
   // Optional. A short line shown on every page, for example
   // "Student project. Not an official school system."
   projectNote: process.env.PROJECT_NOTE || '',

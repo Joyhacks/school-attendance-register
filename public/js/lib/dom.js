@@ -45,3 +45,19 @@ export function mount(el, ...children) {
 }
 
 export const $ = (selector, root = document) => root.querySelector(selector);
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+// Same as h(), for SVG elements (used by the charts).
+export function svg(tag, attrs = {}, ...children) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [name, value] of Object.entries(attrs || {})) {
+    if (value === false || value === null || value === undefined) continue;
+    el.setAttribute(name, String(value));
+  }
+  for (const child of children.flat(Infinity)) {
+    if (child === null || child === undefined || child === false) continue;
+    el.append(child instanceof Node ? child : document.createTextNode(String(child)));
+  }
+  return el;
+}

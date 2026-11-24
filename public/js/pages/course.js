@@ -1,15 +1,16 @@
 import { api } from '../lib/api.js';
 import { openCourseForm } from '../lib/courseForm.js';
 import { $, h, mount } from '../lib/dom.js';
-import { formatDate, formatPercent, periodLabel, plural } from '../lib/format.js';
+import { formatDate, periodLabel, plural } from '../lib/format.js';
 import { getParam, initPage, setParams } from '../lib/shell.js';
 import { openTakeAttendance } from '../lib/takeAttendance.js';
-import { buildField, buildTable, confirmDialog, formDialog, loadInto, showEmpty, showError, toast } from '../lib/ui.js';
+import { icon } from '../lib/icons.js';
+import { button, buildField, buildTable, confirmDialog, formDialog, loadInto, person, rateBar, showEmpty, showError, toast } from '../lib/ui.js';
 
 const TABS = [
-  { key: 'classes', label: 'Classes' },
-  { key: 'students', label: 'Students' },
-  { key: 'report', label: 'Report' },
+  { key: 'classes', label: 'Classes', icon: 'calendar' },
+  { key: 'students', label: 'Students', icon: 'students' },
+  { key: 'report', label: 'Report', icon: 'trend' },
 ];
 
 const user = await initPage({ active: 'courses' });
@@ -38,13 +39,20 @@ function currentTab() {
 
 function renderHeader() {
   document.title = `${course.code} | Attendance Register`;
-  $('#course-title').textContent = `${course.code} ${course.title}`;
-  $('#course-meta').textContent =
-    `${course.lecturerName ? `Lecturer: ${course.lecturerName}` : 'No lecturer assigned'}. Minimum attendance ${course.minAttendance}%.`;
+  $('#course-eyebrow').textContent = course.code;
+  document.querySelector('.back-link').replaceChildren(icon('back', { size: 16 }), 'All courses');
+  $('#course-title').textContent = course.title;
+  mount(
+    $('#course-meta'),
+    h('span', {}, icon('account'), course.lecturerName || 'No lecturer assigned'),
+    h('span', {}, icon('students'), `${course.studentCount} students`),
+    h('span', {}, icon('calendar'), `${course.sessionCount} classes held`),
+    h('span', {}, icon('percent'), `Minimum ${course.minAttendance}%`),
+  );
   mount(
     $('#page-actions'),
-    h('button', { class: 'btn btn--primary', type: 'button', onclick: () => openTakeAttendance([], course.id) }, 'Take attendance'),
-    isAdmin ? h('button', { class: 'btn btn--secondary', type: 'button', onclick: () => openCourseForm(course, loadCourse) }, 'Edit course') : null,
+    isAdmin ? button('Edit course', { icon: 'edit', variant: 'secondary', onclick: () => openCourseForm(course, loadCourse) }) : null,
+    button('Take attendance', { icon: 'take', onclick: () => openTakeAttendance([], course.id) }),
   );
 }
 
@@ -67,7 +75,10 @@ function renderTabs() {
             showTab(tab.key);
           },
         },
-        tab.key === 'students' ? `Students (${course.studentCount})` : tab.label,
+        icon(tab.icon, { size: 16 }),
+        tab.label,
+        tab.key === 'students' ? h('span', { class: 'count' }, course.studentCount) : null,
+        tab.key === 'classes' ? h('span', { class: 'count' }, course.sessionCount) : null,
       ),
     ),
   );
@@ -90,9 +101,10 @@ function loadClasses() {
   return loadInto(panel, () => api(`/courses/${course.id}/sessions`), ({ sessions }) => {
     if (sessions.length === 0) {
       showEmpty(panel, {
+        iconName: 'calendar',
         title: 'No classes yet',
         text: 'Take attendance for the first class and it will be listed here.',
-        action: h('button', { class: 'btn btn--primary', type: 'button', onclick: () => openTakeAttendance([], course.id) }, 'Take attendance'),
+        action: button('Take attendance', { icon: 'take', onclick: () => openTakeAttendance([], course.id) }),
       });
       return;
     }
@@ -108,17 +120,27 @@ function loadClasses() {
           { label: 'Late', numeric: true, cell: (s) => s.late },
           { label: 'Absent', numeric: true, cell: (s) => s.absent },
           { label: 'Excused', numeric: true, cell: (s) => s.excused },
+          { label: 'Turnout', cell: (s) => rateBar(classTurnout(s), course.minAttendance) },
           {
             label: 'Actions',
             actions: true,
-            cell: (s) =>
-              h('button', { class: 'btn btn--quiet btn--danger-text', type: 'button', 'aria-label': `Delete class of ${formatDate(s.date)}`, onclick: () => deleteClass(s) }, 'Delete'),
+            cell: (s) => [
+              button('Open', { variant: 'quiet', href: `/register?class=${s.id}`, ariaLabel: `Open register for ${formatDate(s.date)}` }),
+              button('Delete', { variant: 'quiet btn--danger-text', onclick: () => deleteClass(s), ariaLabel: `Delete class of ${formatDate(s.date)}` }),
+            ],
           },
         ],
         rows: sessions,
       }),
     );
   });
+}
+
+// Share of enrolled students who attended one class, leaving out excused.
+function classTurnout(session) {
+  const counted = course.studentCount - session.excused;
+  if (counted <= 0 || session.present + session.late + session.absent === 0) return null;
+  return Math.round(((session.present + session.late) / counted) * 1000) / 10;
 }
 
 async function deleteClass(session) {
@@ -148,8 +170,8 @@ function studentActions() {
     h(
       'div',
       { class: 'page-head__actions' },
-      h('button', { class: 'btn btn--secondary', type: 'button', onclick: openAddGroup }, 'Add a whole class'),
-      h('button', { class: 'btn btn--primary', type: 'button', onclick: openAddStudents }, 'Add students'),
+      button('Add a whole class', { icon: 'students', variant: 'secondary', onclick: openAddGroup }),
+      button('Add students', { icon: 'userPlus', onclick: openAddStudents }),
     ),
   );
 }
@@ -161,6 +183,7 @@ function loadStudents() {
       const empty = h('div');
       panel.append(empty);
       showEmpty(empty, {
+        iconName: 'students',
         title: 'Nobody is in this course yet',
         text: 'Add students one by one, or add a whole class at once by department and level.',
       });
@@ -172,15 +195,14 @@ function loadStudents() {
       buildTable({
         caption: `Students in ${course.code}`,
         columns: [
-          { label: 'Name', primary: true, cell: (s) => s.fullName },
-          { label: 'Matric number', cell: (s) => h('span', { class: 'num' }, s.matricNo) },
+          { label: 'Name', primary: true, cell: (s) => person(s.fullName, s.matricNo) },
           { label: 'Department', cell: (s) => s.department },
           { label: 'Level', cell: (s) => s.level },
           {
             label: 'Actions',
             actions: true,
             cell: (s) =>
-              h('button', { class: 'btn btn--quiet btn--danger-text', type: 'button', 'aria-label': `Remove ${s.fullName}`, onclick: () => removeStudent(s) }, 'Remove'),
+              button('Remove', { variant: 'quiet btn--danger-text', onclick: () => removeStudent(s), ariaLabel: `Remove ${s.fullName}` }),
           },
         ],
         rows: students,
@@ -304,6 +326,15 @@ async function openAddGroup() {
 
 // ---------- Report ----------
 
+function reportStat(iconName, value, label, alert = false) {
+  return h(
+    'div',
+    { class: alert ? 'stat stat--alert' : 'stat' },
+    h('span', { class: 'stat__icon' }, icon(iconName)),
+    h('div', {}, h('div', { class: 'stat__value' }, value), h('div', { class: 'stat__label' }, label)),
+  );
+}
+
 const STANDING = {
   ok: { label: 'Meets minimum', class: 'badge badge--ok' },
   at_risk: { label: 'Below minimum', class: 'badge badge--risk' },
@@ -314,6 +345,7 @@ function loadReport() {
   return loadInto(panel, () => api(`/courses/${course.id}/report`), ({ report }) => {
     if (report.students.length === 0) {
       showEmpty(panel, {
+        iconName: 'trend',
         title: 'Nothing to report yet',
         text: 'Add students to this course and take attendance. The report builds itself from the register.',
       });
@@ -337,13 +369,23 @@ function loadReport() {
       }),
       ' Show only students below the minimum');
 
+    const rated = report.students.filter((s) => s.percent !== null);
+    const average = rated.length ? Math.round((rated.reduce((sum, s) => sum + s.percent, 0) / rated.length) * 10) / 10 : null;
     mount(
       panel,
       h(
         'div',
-        { class: 'section__head' },
-        h('div', {}, h('h2', {}, 'Attendance report'), h('p', { class: 'muted' }, summary)),
-        h('a', { class: 'btn btn--secondary', href: `/api/courses/${course.id}/report?format=csv`, download: '' }, 'Download as CSV'),
+        { class: 'stats report-stats' },
+        reportStat('calendar', report.sessionsHeld, 'Classes held'),
+        reportStat('students', report.students.length, 'Students'),
+        reportStat('percent', average === null ? 'No data' : `${average}%`, 'Average attendance'),
+        reportStat('alert', report.atRiskCount, `Below ${report.minAttendance}%`, report.atRiskCount > 0),
+      ),
+      h(
+        'div',
+        { class: 'section__head report-head' },
+        h('div', {}, h('h2', {}, 'Attendance report'), h('p', { class: 'section__sub' }, summary)),
+        button('Download CSV', { icon: 'download', variant: 'secondary', href: `/api/courses/${course.id}/report?format=csv`, download: '' }),
       ),
       h('p', { class: 'report-filter' }, filter),
       rows.length
@@ -351,18 +393,17 @@ function loadReport() {
             caption: `Attendance report for ${course.code}`,
             rowClass: (s) => (s.standing === 'at_risk' ? 'is-flagged' : null),
             columns: [
-              { label: 'Name', primary: true, cell: (s) => s.fullName },
-              { label: 'Matric number', cell: (s) => h('span', { class: 'num' }, s.matricNo) },
+              { label: 'Name', primary: true, cell: (s) => person(s.fullName, s.matricNo, s.standing === 'at_risk' ? 'risk' : '') },
               { label: 'Present', numeric: true, cell: (s) => s.present },
               { label: 'Late', numeric: true, cell: (s) => s.late },
               { label: 'Absent', numeric: true, cell: (s) => s.absent },
               { label: 'Excused', numeric: true, cell: (s) => s.excused },
-              { label: 'Attendance', numeric: true, cell: (s) => formatPercent(s.percent) },
+              { label: 'Attendance', cell: (s) => rateBar(s.percent, report.minAttendance) },
               { label: 'Standing', cell: (s) => h('span', { class: STANDING[s.standing].class }, STANDING[s.standing].label) },
             ],
             rows,
           })
-        : h('div', { class: 'state' }, h('h2', {}, 'Nobody is below the minimum'), h('p', {}, `Every student in ${course.code} is at ${report.minAttendance}% or higher.`)),
+        : h('div', { class: 'state' }, h('span', { class: 'state__icon' }, icon('check')), h('h2', {}, 'Nobody is below the minimum'), h('p', {}, `Every student in ${course.code} is at ${report.minAttendance}% or higher.`)),
       h('p', { class: 'field__help report-note' },
         'Present and late both count as attended. Excused classes are left out of the total. A class with no mark counts as absent.'),
     );

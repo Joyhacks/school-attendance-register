@@ -1,6 +1,6 @@
 # Attendance Register
 
-A school attendance management system. Lecturers mark the register on a phone or laptop, and the system works out who is below the minimum attendance.
+A school attendance management system, built as a final year project for Best Solution Polytechnic, Akure. Lecturers mark the register on a phone or laptop, and the system works out who is below the minimum attendance.
 
 Front end: HTML, CSS and JavaScript (no framework).
 Back end: Node.js and Express.
@@ -9,8 +9,12 @@ Database: MySQL.
 Why is there a back end? A web page cannot talk to MySQL on its own, because that would put the database password inside the browser where anyone can read it. So the browser talks to a small Node.js server, and only the server talks to MySQL.
 
 <p>
-  <img src="docs/dashboard.png" alt="Dashboard with student, course and class counts, and a list of courses" width="640">
+  <img src="docs/dashboard.png" alt="Dashboard with student and course counts, a weekly attendance chart and the students below the minimum" width="640">
   <img src="docs/register-phone.png" alt="The register on a phone, with Present, Absent, Late and Excused for each student" width="200">
+</p>
+<p>
+  <img src="docs/sign-in.png" alt="Sign-in page with the school crest, name and motto" width="420">
+  <img src="docs/course-report.png" alt="Course attendance report with a rate bar for every student" width="420">
 </p>
 
 ## What it does
@@ -20,6 +24,7 @@ Why is there a back end? A web page cannot talk to MySQL on its own, because tha
 - Courses: create a course, assign a lecturer, set the minimum attendance (75% by default).
 - Put students in a course one by one, or a whole department and level at once.
 - Take attendance: each student is marked Present, Absent, Late or Excused.
+- A dashboard with the average attendance, an 8-week attendance chart and the students who need attention.
 - Reports per course with a percentage for every student, a flag on everyone below the minimum, and a CSV download that opens in Excel.
 - Staff accounts: add lecturers, reset passwords, deactivate accounts.
 
@@ -219,6 +224,7 @@ The app runs on any host that gives you Node.js and MySQL. On a host there is no
 | `NODE_ENV` | `production` |
 | `SCHOOL_NAME` | the school name shown on every page |
 | `SCHOOL_MOTTO` | optional, shown on the sign-in page |
+| `SCHOOL_ADDRESS` | optional, shown on the sign-in page |
 | `PROJECT_NOTE` | optional, a line shown on every page |
 
 3. Under Settings, Networking, press **Generate Domain**.
@@ -249,6 +255,8 @@ Checked in a desktop browser at phone, tablet and desktop sizes. Not yet checked
 
 ## Look and fonts
 
-The colours are set up for Best Solution Polytechnic, Akure (green `#2a7d2e`, as on bestpotech.edu.ng). To use another school's colours, change the brand block at the top of `public/css/tokens.css`. Everything else follows from it.
+The design follows the Best Solution Polytechnic website (bestpotech.edu.ng): the school crest, green `#2a7d2e` with deep green `#0f3d16`, the bright green rule under headings, gold section labels, Montserrat headings, Roboto body text and 4px corners. Every value lives at the top of `public/css/tokens.css`, so another school's colours are one block of changes.
 
-Headings use Montserrat. Body text uses Atkinson Hyperlegible Next, made by the Braille Institute, which keeps look-alike characters such as 0 and O, or 1 and l, easy to tell apart when reading matric numbers. Both are bundled in `public/fonts` under the SIL Open Font License, so the system works with no internet connection.
+The crest and name belong to Best Solution Polytechnic, Akure, and are used here for a student project. Every page shows a note saying it is not an official school system, set with `PROJECT_NOTE`.
+
+Charts are drawn as SVG in the browser, with no chart library. Icons are from Lucide (ISC licence). Roboto and Montserrat are bundled in `public/fonts` under the SIL Open Font License, so the system works with no internet connection.

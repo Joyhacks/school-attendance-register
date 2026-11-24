@@ -1,6 +1,7 @@
 // Shared interface pieces: toasts, dialogs, tables and page states.
 import { ApiError } from './api.js';
 import { h, mount } from './dom.js';
+import { icon } from './icons.js';
 
 let idCounter = 0;
 const nextId = (prefix) => `${prefix}-${(idCounter += 1)}`;
@@ -23,7 +24,55 @@ export function toast(message, { error = false } = {}) {
   setTimeout(() => item.remove(), error ? 7000 : 4000);
 }
 
-// ---------- Buttons ----------
+// ---------- Buttons, avatars, rate bars ----------
+
+// button('Add course', { icon: 'plus', onclick }) or with href for a link.
+export function button(label, { icon: iconName, variant = 'primary', href, onclick, ariaLabel, type = 'button', download } = {}) {
+  const attrs = { class: `btn btn--${variant}`, 'aria-label': ariaLabel };
+  const content = [iconName ? icon(iconName) : null, label];
+  if (href) return h('a', { ...attrs, href, download }, content);
+  return h('button', { ...attrs, type, onclick }, content);
+}
+
+export function initials(name) {
+  const parts = String(name || '').replace(/^(dr|mr|mrs|ms|prof|engr)\.?\s+/i, '').trim().split(/\s+/);
+  return ((parts[0]?.[0] || '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+}
+
+export function avatar(name, variant = '') {
+  return h('span', { class: variant ? `avatar avatar--${variant}` : 'avatar', 'aria-hidden': 'true' }, initials(name));
+}
+
+// Name with initials and a second line, used in lists and tables.
+export function person(name, sub, variant) {
+  return h(
+    'span',
+    { class: 'person' },
+    avatar(name, variant),
+    h('span', { class: 'person__text' }, h('span', { class: 'person__name' }, name), sub ? h('span', { class: 'person__sub' }, sub) : null),
+  );
+}
+
+// Course code chip above the course title, linking to the course.
+export function courseCell(course, href = `/course?id=${course.id}`) {
+  return h('a', { class: 'course-cell', href }, h('span', { class: 'code-chip' }, course.code), h('span', {}, course.title));
+}
+
+// A thin progress bar with the percentage, red when below the minimum.
+export function rateBar(percent, minimum = 75) {
+  if (percent === null || percent === undefined) {
+    return h('span', { class: 'rate rate--empty' }, h('span', { class: 'rate__track' }), h('span', { class: 'rate__value' }, 'No data'));
+  }
+  const low = percent < minimum;
+  const fill = h('span', { class: 'rate__fill' });
+  fill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+  return h(
+    'span',
+    { class: low ? 'rate rate--low' : 'rate', role: 'img', 'aria-label': `${percent}% attendance${low ? ', below the minimum' : ''}` },
+    h('span', { class: 'rate__track' }, fill),
+    h('span', { class: 'rate__value', 'aria-hidden': 'true' }, `${percent}%`),
+  );
+}
 
 // Runs an async action while the button shows a busy label. The busy
 // flag also blocks a second click, so nothing is submitted twice.
@@ -49,8 +98,11 @@ export function showLoading(container, label = 'Loading') {
   );
 }
 
-export function showEmpty(container, { title, text, action }) {
-  mount(container, h('div', { class: 'state' }, h('h2', {}, title), text ? h('p', {}, text) : null, action || null));
+export function showEmpty(container, { title, text, action, iconName = 'layers' }) {
+  mount(
+    container,
+    h('div', { class: 'state' }, h('span', { class: 'state__icon' }, icon(iconName)), h('h2', {}, title), text ? h('p', {}, text) : null, action || null),
+  );
 }
 
 export function showError(container, error, retry) {
@@ -59,9 +111,10 @@ export function showError(container, error, retry) {
     h(
       'div',
       { class: 'state state--error', role: 'alert' },
+      h('span', { class: 'state__icon' }, icon('alert')),
       h('h2', {}, 'This did not load'),
       h('p', {}, error?.message || 'Something went wrong.'),
-      retry ? h('button', { class: 'btn btn--secondary', type: 'button', onclick: retry }, 'Try again') : null,
+      retry ? button('Try again', { variant: 'secondary', onclick: retry }) : null,
     ),
   );
 }
@@ -205,6 +258,16 @@ export function buildField(field) {
   });
 
   return { name: field.name, label: field.label, wrapper, control, setError, isMissing };
+}
+
+// Turns a built field into a search box with a magnifier icon.
+export function asSearchField(field) {
+  field.control.type = 'search';
+  field.control.classList.add('input--search');
+  const wrap = h('div', { class: 'search-wrap' });
+  field.control.replaceWith(wrap);
+  wrap.append(icon('search', { size: 18 }), field.control);
+  return field;
 }
 
 // Wires a set of fields to a submit handler: required checks, errors

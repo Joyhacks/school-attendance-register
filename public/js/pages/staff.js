@@ -1,7 +1,7 @@
 import { api } from '../lib/api.js';
 import { $, h, mount } from '../lib/dom.js';
 import { initPage } from '../lib/shell.js';
-import { buildTable, confirmDialog, formDialog, loadInto, toast } from '../lib/ui.js';
+import { button, buildTable, confirmDialog, formDialog, loadInto, person, toast } from '../lib/ui.js';
 
 const user = await initPage({ active: 'staff', adminOnly: true });
 const content = $('#content');
@@ -11,7 +11,7 @@ const ROLE_OPTIONS = [
 ];
 const PASSWORD_HELP = 'At least 8 characters. Give it to them in person. They can change it under My account.';
 
-mount($('#page-actions'), h('button', { class: 'btn btn--primary', type: 'button', onclick: () => openStaffForm() }, 'Add staff account'));
+mount($('#page-actions'), button('Add staff account', { icon: 'userPlus', onclick: () => openStaffForm() }));
 
 function load() {
   return loadInto(content, () => api('/users'), render);
@@ -76,9 +76,8 @@ function render({ users }) {
     buildTable({
       caption: 'Staff accounts',
       columns: [
-        { label: 'Name', primary: true, cell: (m) => (m.id === user.id ? `${m.fullName} (you)` : m.fullName) },
-        { label: 'Email', cell: (m) => m.email },
-        { label: 'Role', cell: (m) => (m.role === 'admin' ? 'Admin' : 'Lecturer') },
+        { label: 'Name', primary: true, cell: (m) => person(m.id === user.id ? `${m.fullName} (you)` : m.fullName, m.email, m.role === 'admin' ? 'deep' : '') },
+        { label: 'Role', cell: (m) => (m.role === 'admin' ? 'Administrator' : 'Lecturer') },
         { label: 'Courses', numeric: true, cell: (m) => m.courseCount },
         {
           label: 'Status',
@@ -88,13 +87,13 @@ function render({ users }) {
           label: 'Actions',
           actions: true,
           cell: (m) => [
-            h('button', { class: 'btn btn--quiet', type: 'button', 'aria-label': `Edit ${m.fullName}`, onclick: () => openStaffForm(m) }, 'Edit'),
-            h('button', { class: 'btn btn--quiet', type: 'button', 'aria-label': `Reset password for ${m.fullName}`, onclick: () => openResetPassword(m) }, 'Reset password'),
+            button('Edit', { variant: 'quiet', ariaLabel: `Edit ${m.fullName}`, onclick: () => openStaffForm(m) }),
+            button('Reset password', { variant: 'quiet', ariaLabel: `Reset password for ${m.fullName}`, onclick: () => openResetPassword(m) }),
             m.id === user.id
               ? null
               : m.isActive
-                ? h('button', { class: 'btn btn--quiet btn--danger-text', type: 'button', 'aria-label': `Deactivate ${m.fullName}`, onclick: () => setActive(m, false) }, 'Deactivate')
-                : h('button', { class: 'btn btn--quiet', type: 'button', 'aria-label': `Reactivate ${m.fullName}`, onclick: () => setActive(m, true) }, 'Reactivate'),
+                ? button('Deactivate', { variant: 'quiet btn--danger-text', ariaLabel: `Deactivate ${m.fullName}`, onclick: () => setActive(m, false) })
+                : button('Reactivate', { variant: 'quiet', ariaLabel: `Reactivate ${m.fullName}`, onclick: () => setActive(m, true) }),
           ],
         },
       ],

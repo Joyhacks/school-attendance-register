@@ -1,83 +1,75 @@
 /* Design tokens. Every colour, size and radius in the app comes from here.
-   To rebrand for another school, change the brand block below.
-   Current brand: Best Solution Polytechnic, Akure (green #2a7d2e,
-   Montserrat headings), taken from bestpotech.edu.ng. */
+   Brand: Best Solution Polytechnic, Akure. Values measured from
+   bestpotech.edu.ng: green #2a7d2e, deep greens #1a5020 and #0f3d16,
+   bright accent #16cb00, gold #d97706 / #f59e0b, Montserrat headings,
+   Roboto body text, 4px control radius. To rebrand, change the brand block. */
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("/fonts/montserrat-latin-700-normal.woff2") format("woff2");
-  font-weight: 700;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Atkinson Hyperlegible Next";
-  src: url("/fonts/atkinson-hyperlegible-next-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Atkinson Hyperlegible Next";
-  src: url("/fonts/atkinson-hyperlegible-next-latin-600-normal.woff2") format("woff2");
-  font-weight: 600;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Atkinson Hyperlegible Next";
-  src: url("/fonts/atkinson-hyperlegible-next-latin-700-normal.woff2") format("woff2");
-  font-weight: 700;
-  font-display: swap;
-}
+@font-face { font-family: "Roboto"; src: url("/fonts/roboto-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Roboto"; src: url("/fonts/roboto-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Roboto"; src: url("/fonts/roboto-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Roboto"; src: url("/fonts/roboto-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Montserrat"; src: url("/fonts/montserrat-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Montserrat"; src: url("/fonts/montserrat-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
 
 :root {
   /* Brand */
   --brand: #2a7d2e;
-  --brand-deep: #123a17;
-  --brand-deep-hover: #1b4d21;
-  --brand-deep-line: #3a5e3e;
-  --on-brand-deep: #ffffff;
-  --on-brand-deep-2: #cfe3d1;
-  --on-brand-deep-3: #a9c9ad;
+  --brand-hover: #226a26;
+  --brand-strong: #1a5020;
+  --brand-deep: #0f3d16;
+  --brand-bright: #16cb00;
+  --brand-soft: #f0fdf4;
+  --brand-tint: #dcf2de;
+  --gold: #f59e0b;
+  --gold-text: #b45309;
+  --gold-soft: #fef3c7;
 
-  /* Surfaces and ink */
-  --canvas: #f2f5f1;
+  /* Text and surfaces (slate, as on the school site) */
+  --heading: #0f172a;
+  --ink: #374151;
+  --ink-2: #4b5563;
+  --ink-3: #576173;
+  --canvas: #f6f8f6;
   --surface: #ffffff;
-  --surface-sunken: #e7ece6;
-  --ink: #151a17;
-  --ink-2: #414c45;
-  --ink-3: #5a665e;
-  --line: #d3dbd2;
-  --line-strong: #7c8a7f;
+  --surface-muted: #f8fafc;
+  --line: #e2e8f0;
+  --line-strong: #94a3b8;
+  --on-deep: #ffffff;
+  --on-deep-2: #d4e7d6;
+  --on-deep-3: #a8c8ac;
+  --deep-hover: rgb(255 255 255 / 0.08);
+  --deep-line: rgb(255 255 255 / 0.12);
 
-  /* Action colour */
+  /* Actions */
   --accent: var(--brand);
-  --accent-hover: #1f6223;
-  --accent-soft: #e6f2e7;
+  --accent-hover: var(--brand-hover);
   --on-accent: #ffffff;
 
-  /* Attendance marks. Each also carries a letter, never colour alone. */
-  --present: #1a7442;
-  --present-soft: #e1f0e5;
-  --absent: #b42318;
-  --absent-soft: #fbe8e6;
-  --late: #875400;
-  --late-soft: #faeed0;
-  --excused: #46546a;
-  --excused-soft: #e6eaf0;
+  /* Attendance marks. Each also carries its word, never colour alone. */
+  --present: #1f7a33;
+  --present-soft: #e3f4e6;
+  --absent: #c0392b;
+  --absent-soft: #fdecea;
+  --late: #b45309;
+  --late-soft: #fef3c7;
+  --excused: #475569;
+  --excused-soft: #eef2f6;
 
-  --danger: #b42318;
-  --danger-hover: #8f1c13;
+  --danger: #c0392b;
+  --danger-hover: #9b2c21;
 
   /* Type */
-  --font: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: "Montserrat", var(--font);
-  --text-xs: 0.8125rem;
-  --text-sm: 0.9375rem;
-  --text-md: 1rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 0.9375rem;
   --text-lg: 1.125rem;
   --text-xl: 1.375rem;
   --text-2xl: 1.75rem;
+  --text-3xl: 2.125rem;
 
-  /* Spacing, 8px scale */
+  /* Spacing, 4px base */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -86,11 +78,13 @@
   --space-6: 2rem;
   --space-7: 3rem;
 
-  --radius-control: 6px;
-  --radius-panel: 10px;
+  --radius-control: 4px;
+  --radius-panel: 8px;
+  --shadow-panel: 0 1px 2px rgb(15 23 42 / 0.05);
+  --shadow-raised: 0 8px 24px rgb(15 23 42 / 0.10);
   --control-height: 2.75rem;
-  --sidebar-width: 15rem;
-  --content-width: 68rem;
+  --sidebar-width: 16.5rem;
+  --content-width: 76rem;
 
   --z-sticky: 10;
   --z-nav: 20;
