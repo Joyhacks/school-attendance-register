@@ -99,6 +99,12 @@ function quote(value) {
   if (mark === undefined || /[\r\n]/.test(text)) fail('That value has a mix of quote marks or a line break that cannot be saved to .env.');
   return `${mark}${text}${mark}`;
 }
+// Settings setup does not ask about (motto, address, project note and
+// anything added by hand) are kept exactly as they were.
+const managed = ['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME', 'PORT', 'SCHOOL_NAME', 'SESSION_SECRET', 'NODE_ENV'];
+const kept = Object.entries(saved)
+  .filter(([key]) => !managed.includes(key))
+  .map(([key, value]) => `${key}=${quote(value)}`);
 fs.writeFileSync(
   envPath,
   [
@@ -112,6 +118,7 @@ fs.writeFileSync(
     `SCHOOL_NAME=${quote(schoolName)}`,
     `SESSION_SECRET=${sessionSecret}`,
     `NODE_ENV=${saved.NODE_ENV || 'development'}`,
+    ...kept,
     '',
   ].join('\n'),
   { mode: 0o600 },

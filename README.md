@@ -8,13 +8,17 @@ Database: MySQL.
 
 Why is there a back end? A web page cannot talk to MySQL on its own, because that would put the database password inside the browser where anyone can read it. So the browser talks to a small Node.js server, and only the server talks to MySQL.
 
+![Dashboard with the average attendance, a weekly attendance chart and the students below the minimum](docs/dashboard.png)
+
+| Sign in | Course report |
+|---|---|
+| ![Sign-in page with the school crest, name and motto](docs/sign-in.png) | ![Course attendance report with a rate bar for every student](docs/course-report.png) |
+| **Students** | **Marking the register** |
+| ![Student list with search and filters](docs/students.png) | ![Class register with Present, Absent, Late and Excused for each student](docs/register.png) |
+
 <p>
-  <img src="docs/dashboard.png" alt="Dashboard with student and course counts, a weekly attendance chart and the students below the minimum" width="640">
-  <img src="docs/register-phone.png" alt="The register on a phone, with Present, Absent, Late and Excused for each student" width="200">
-</p>
-<p>
-  <img src="docs/sign-in.png" alt="Sign-in page with the school crest, name and motto" width="420">
-  <img src="docs/course-report.png" alt="Course attendance report with a rate bar for every student" width="420">
+  <img src="docs/register-phone.png" alt="The register on a phone, with a running tally and one save button" width="260">
+  <img src="docs/dashboard-phone.png" alt="The dashboard on a phone" width="260">
 </p>
 
 ## What it does
