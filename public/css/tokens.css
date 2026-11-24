@@ -1,0 +1,83 @@
+/* Design tokens. Every colour, size and radius in the app comes from here.
+   The look is taken from a paper class register: paper, ink, a blue
+   biro for actions and a red one for absences. */
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-hyperlegible-next-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-hyperlegible-next-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-hyperlegible-next-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  /* Surfaces and ink */
+  --canvas: #f1f3f0;
+  --surface: #ffffff;
+  --surface-sunken: #e8ebe7;
+  --ink: #151a21;
+  --ink-2: #414c58;
+  --ink-3: #5a6672;
+  --line: #d5dad5;
+  --line-strong: #7c8792;
+
+  /* Action colour: biro blue */
+  --accent: #1e3a9a;
+  --accent-hover: #172d7a;
+  --accent-soft: #e6ebf8;
+  --on-accent: #ffffff;
+
+  /* Attendance marks. Each also carries a letter, never colour alone. */
+  --present: #1a7442;
+  --present-soft: #e1f0e5;
+  --absent: #b42318;
+  --absent-soft: #fbe8e6;
+  --late: #875400;
+  --late-soft: #faeed0;
+  --excused: #46546a;
+  --excused-soft: #e6eaf0;
+
+  --danger: #b42318;
+  --danger-hover: #8f1c13;
+
+  /* Type */
+  --font: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+
+  /* Spacing, 8px scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --radius-control: 6px;
+  --radius-panel: 10px;
+  --control-height: 2.75rem;
+  --sidebar-width: 15rem;
+  --content-width: 68rem;
+
+  --z-sticky: 10;
+  --z-nav: 20;
+  --z-toast: 40;
+
+  --fast: 140ms;
+}
