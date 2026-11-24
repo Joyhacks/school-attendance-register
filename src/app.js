@@ -63,7 +63,18 @@ export function createApp({ pool, config }) {
     }),
   );
 
-  app.use(express.static(publicDir, { extensions: ['html'], maxAge: config.isProduction ? '1h' : 0 }));
+  // Pages, CSS and JS are checked for changes on every visit (cheap,
+  // thanks to ETags), so an update shows up straight away. Fonts and
+  // images rarely change and are kept for a week.
+  app.use(
+    express.static(publicDir, {
+      extensions: ['html'],
+      setHeaders(res, filePath) {
+        const longLived = /[\\/](fonts|img)[\\/]/.test(filePath);
+        res.setHeader('Cache-Control', longLived ? 'public, max-age=604800' : 'no-cache');
+      },
+    }),
+  );
 
   // Everything under /api
   const api = express.Router();

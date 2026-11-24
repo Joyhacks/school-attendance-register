@@ -33,7 +33,8 @@ try {
 
 const app = createApp({ pool, config });
 const server = app.listen(env.port, () => {
-  console.log(`\nAttendance system is running.\nOpen http://localhost:${env.port} in your browser.\nPress Ctrl + C to stop.\n`);
+  if (env.isProduction) console.log(`Attendance system is running on port ${env.port}.`);
+  else console.log(`\nAttendance system is running.\nOpen http://localhost:${env.port} in your browser.\nPress Ctrl + C to stop.\n`);
 });
 
 server.on('error', (err) => {
