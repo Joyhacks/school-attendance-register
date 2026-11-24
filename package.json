@@ -14,7 +14,7 @@
     "dev": "node --watch src/server.js",
     "seed:demo": "node scripts/seed-demo.js",
     "test": "node --test tests/unit/attendanceMath.test.js tests/unit/validators.test.js tests/unit/csv.test.js",
-    "test:api": "node --test tests/api/api.test.js"
+    "test:api": "node --test --test-concurrency=1 tests/api/api.test.js tests/api/setup.test.js"
   },
   "license": "MIT",
   "author": "Adeola Ilori",

@@ -1149,3 +1149,11 @@
 .app-main:has(.save-bar) {
   padding-bottom: 0;
 }
+
+.setup-demo {
+  margin-bottom: var(--space-4);
+}
+
+.setup-logins {
+  margin-top: var(--space-3);
+}

@@ -105,3 +105,12 @@ CREATE TABLE IF NOT EXISTS login_sessions (
   KEY idx_login_sessions_user (user_id),
   KEY idx_login_sessions_expires (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Values the system keeps for itself, such as the generated session
+-- secret on a hosted install.
+CREATE TABLE IF NOT EXISTS app_settings (
+  name        VARCHAR(64) NOT NULL,
+  value       TEXT NOT NULL,
+  updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

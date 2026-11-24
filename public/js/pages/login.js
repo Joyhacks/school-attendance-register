@@ -24,6 +24,17 @@ async function start() {
     // The page still works without the school name.
   }
 
+  // A fresh install has no admin yet: send the visitor to setup.
+  try {
+    const { needsSetup } = await api('/setup/status');
+    if (needsSetup) {
+      window.location.replace('/setup');
+      return;
+    }
+  } catch {
+    // Carry on to the sign-in form.
+  }
+
   try {
     const { signedIn } = await api('/auth/status');
     if (signedIn) {

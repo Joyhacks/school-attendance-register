@@ -191,7 +191,7 @@ Runs 20 quick checks on the validation rules, the attendance formula and the CSV
 npm run test:api
 ```
 
-Runs 19 end-to-end checks through the real API: sign-in, permissions, a lecturer trying to open another lecturer's course, double clicks, bad input, the report numbers. It uses its own database (your database name with `_test` added) and wipes that test database on every run. Your real data is never touched.
+Runs 26 end-to-end checks through the real API: sign-in, permissions, a lecturer trying to open another lecturer's course, double clicks, bad input, the report numbers, and the one-time setup page. It uses its own databases (your database name with `_test` and `_setup_test` added) and wipes them on every run. Your real data is never touched.
 
 Both sets pass on MySQL 8.0 and on MariaDB 10.11.
 
@@ -208,25 +208,26 @@ Both sets pass on MySQL 8.0 and on MariaDB 10.11.
 
 ## Deploying online (Railway)
 
-The app runs on any host that gives you Node.js and MySQL. On a host there is no terminal for `npm run setup`, so the server does the setup itself on every start: it creates missing tables, creates the first admin from settings, and can add the demo data.
+The app runs on any host that gives you Node.js and MySQL. On a host there is no terminal for `npm run setup`, so the server sets itself up on every start: it creates missing tables and generates its own session secret.
 
 1. Create a project on Railway with a **MySQL** database and a service from this GitHub repo.
-2. In the app service, set these variables:
+2. In the app service, set these variables. None of them are passwords:
 
 | Variable | Value |
 |---|---|
 | `DATABASE_URL` | `${{MySQL.MYSQL_URL}}` (Railway fills it in) |
 | `NODE_ENV` | `production` |
-| `SESSION_SECRET` | 64 random characters |
 | `SCHOOL_NAME` | the school name shown on every page |
-| `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | the first admin account |
 | `SCHOOL_MOTTO` | optional, shown on the sign-in page |
 | `PROJECT_NOTE` | optional, a line shown on every page |
-| `DEMO_DATA`, `DEMO_PASSWORD` | optional: `true` and a password to load the demo records into an empty system |
 
 3. Under Settings, Networking, press **Generate Domain**.
+4. Open the app's **Deploy Logs** and copy the line `Setup code: XXXX-XXXX`.
+5. Open the site. It shows **Set up this system**. Enter the setup code, then your name, email and password. Tick the box to add the demo data.
 
-The `ADMIN_*` settings are only used while there is no admin yet. Changing them later does nothing, so a password changed in the app is never reset on restart.
+The setup page works once. After the first admin exists it sends everyone to sign in. Only someone who can read the server log has the code, so a stranger who finds the link first cannot claim the system.
+
+If you would rather not use the setup page, set `ADMIN_NAME`, `ADMIN_EMAIL` and `ADMIN_PASSWORD` instead, and optionally `SESSION_SECRET`, `DEMO_DATA=true` and `DEMO_PASSWORD`.
 
 ## Before putting it on the internet
 

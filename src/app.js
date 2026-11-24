@@ -11,11 +11,13 @@ import { apiNotFound, errorHandler } from './middleware/errorHandler.js';
 import { authRoutes } from './routes/auth.routes.js';
 import { courseRoutes } from './routes/courses.routes.js';
 import { sessionRoutes } from './routes/sessions.routes.js';
+import { setupRoutes } from './routes/setup.routes.js';
 import { studentRoutes } from './routes/students.routes.js';
 import { userRoutes } from './routes/users.routes.js';
 import { createAttendanceService } from './services/attendance.service.js';
 import { createCourseService } from './services/courses.service.js';
 import { createDashboardService } from './services/dashboard.service.js';
+import { createSetupService } from './services/setup.service.js';
 import { createStudentService } from './services/students.service.js';
 import { createUserService } from './services/users.service.js';
 import { rules, validate } from './utils/validators.js';
@@ -34,6 +36,7 @@ export function createApp({ pool, config }) {
   const courses = createCourseService(pool);
   const attendance = createAttendanceService(pool);
   const dashboard = createDashboardService(pool);
+  const setup = createSetupService(pool, () => config.setupCode || '');
   const requireAuth = buildRequireAuth(users);
 
   app.disable('x-powered-by');
@@ -87,6 +90,7 @@ export function createApp({ pool, config }) {
     res.json({ schoolName: config.schoolName, schoolMotto: config.schoolMotto || '', projectNote: config.projectNote || '' }),
   );
   api.use('/auth', authRoutes({ users, requireAuth }));
+  api.use('/setup', setupRoutes({ setup }));
 
   // From here on, a signed-in user is required.
   api.use(requireAuth);

@@ -1,5 +1,6 @@
 // Start-up jobs for a hosted install, where nobody can run
 // "npm run setup" by hand.
+import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { rules } from '../utils/validators.js';
 import { seedDemoData } from './demoData.js';
@@ -31,4 +32,24 @@ export async function ensureDemoData(pool, { enabled, password }) {
   if (rules.password()(password).error) throw new Error('DEMO_PASSWORD must be 8 to 72 characters when DEMO_DATA is true.');
   await seedDemoData(pool, password);
   return 'added';
+}
+
+// Returns the session secret kept in the database, creating it on the
+// first start. INSERT IGNORE means two servers starting together still
+// end up with the same secret.
+export async function ensureSessionSecret(pool) {
+  await pool.query("INSERT IGNORE INTO app_settings (name, value) VALUES ('session_secret', ?)", [
+    crypto.randomBytes(48).toString('hex'),
+  ]);
+  const [[row]] = await pool.query("SELECT value FROM app_settings WHERE name = 'session_secret'");
+  return row.value;
+}
+
+// A short code for the one-time setup page, shown only in the server
+// log, so only the person running the server can create the first admin.
+export function makeSetupCode() {
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const bytes = crypto.randomBytes(8);
+  const chars = [...bytes].map((byte) => letters[byte % letters.length]);
+  return `${chars.slice(0, 4).join('')}-${chars.slice(4).join('')}`;
 }

@@ -11,9 +11,11 @@ function required(name) {
   return value;
 }
 
-const sessionSecret = required('SESSION_SECRET');
-if (sessionSecret.length < 32) {
-  console.error('\nSESSION_SECRET must be at least 32 characters. Run "npm run setup" to generate one.\n');
+// Optional. When it is not set, the server generates one and keeps it
+// in the database (see src/db/bootstrap.js).
+const sessionSecret = process.env.SESSION_SECRET || '';
+if (sessionSecret && sessionSecret.length < 32) {
+  console.error('\nSESSION_SECRET must be at least 32 characters. Run "npm run setup" to generate one, or remove it.\n');
   process.exit(1);
 }
 
