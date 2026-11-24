@@ -83,7 +83,9 @@ export function createApp({ pool, config }) {
     next();
   });
 
-  api.get('/meta', (req, res) => res.json({ schoolName: config.schoolName }));
+  api.get('/meta', (req, res) =>
+    res.json({ schoolName: config.schoolName, schoolMotto: config.schoolMotto || '', projectNote: config.projectNote || '' }),
+  );
   api.use('/auth', authRoutes({ users, requireAuth }));
 
   // From here on, a signed-in user is required.

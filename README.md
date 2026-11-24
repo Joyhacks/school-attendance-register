@@ -206,6 +206,28 @@ Both sets pass on MySQL 8.0 and on MariaDB 10.11.
 - Changing or resetting a password signs that person out on their other devices.
 - CSV downloads are protected against spreadsheet formula injection.
 
+## Deploying online (Railway)
+
+The app runs on any host that gives you Node.js and MySQL. On a host there is no terminal for `npm run setup`, so the server does the setup itself on every start: it creates missing tables, creates the first admin from settings, and can add the demo data.
+
+1. Create a project on Railway with a **MySQL** database and a service from this GitHub repo.
+2. In the app service, set these variables:
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | `${{MySQL.MYSQL_URL}}` (Railway fills it in) |
+| `NODE_ENV` | `production` |
+| `SESSION_SECRET` | 64 random characters |
+| `SCHOOL_NAME` | the school name shown on every page |
+| `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | the first admin account |
+| `SCHOOL_MOTTO` | optional, shown on the sign-in page |
+| `PROJECT_NOTE` | optional, a line shown on every page |
+| `DEMO_DATA`, `DEMO_PASSWORD` | optional: `true` and a password to load the demo records into an empty system |
+
+3. Under Settings, Networking, press **Generate Domain**.
+
+The `ADMIN_*` settings are only used while there is no admin yet. Changing them later does nothing, so a password changed in the app is never reset on restart.
+
 ## Before putting it on the internet
 
 On your own computer or a classroom network the defaults are fine. On a public server, do these first:
@@ -224,6 +246,8 @@ Not included: students signing in to see their own attendance, QR code or finger
 
 Checked in a desktop browser at phone, tablet and desktop sizes. Not yet checked on a physical phone or on Windows with XAMPP 10.4, so do one run through setup and the marking screen on your own machine before a demo.
 
-## Font
+## Look and fonts
 
-The interface uses Atkinson Hyperlegible Next, made by the Braille Institute. It keeps look-alike characters such as 0 and O, or 1 and l, easy to tell apart, which matters when reading matric numbers. It is bundled in `public/fonts` under the SIL Open Font License, so the system works with no internet connection.
+The colours are set up for Best Solution Polytechnic, Akure (green `#2a7d2e`, as on bestpotech.edu.ng). To use another school's colours, change the brand block at the top of `public/css/tokens.css`. Everything else follows from it.
+
+Headings use Montserrat. Body text uses Atkinson Hyperlegible Next, made by the Braille Institute, which keeps look-alike characters such as 0 and O, or 1 and l, easy to tell apart when reading matric numbers. Both are bundled in `public/fonts` under the SIL Open Font License, so the system works with no internet connection.

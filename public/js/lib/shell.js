@@ -49,6 +49,7 @@ export async function initPage({ active, adminOnly = false }) {
       h('div', { class: 'app-user__name' }, user.fullName),
       h('div', { class: 'app-user__role' }, ROLE_LABELS[user.role]),
       h('button', { type: 'button', onclick: signOut }, 'Sign out'),
+      meta.projectNote ? h('p', { class: 'project-note' }, meta.projectNote) : null,
     ),
   );
 

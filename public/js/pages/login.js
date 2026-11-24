@@ -13,6 +13,13 @@ async function start() {
   try {
     const meta = await api('/meta');
     $('#school-name').textContent = meta.schoolName;
+    document.title = `Sign in | ${meta.schoolName} Attendance Register`;
+    for (const [id, text] of [['#school-motto', meta.schoolMotto], ['#project-note', meta.projectNote]]) {
+      if (text) {
+        $(id).textContent = text;
+        $(id).hidden = false;
+      }
+    }
   } catch {
     // The page still works without the school name.
   }

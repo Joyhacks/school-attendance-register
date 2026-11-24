@@ -1,7 +1,14 @@
 /* Design tokens. Every colour, size and radius in the app comes from here.
-   The look is taken from a paper class register: paper, ink, a blue
-   biro for actions and a red one for absences. */
+   To rebrand for another school, change the brand block below.
+   Current brand: Best Solution Polytechnic, Akure (green #2a7d2e,
+   Montserrat headings), taken from bestpotech.edu.ng. */
 
+@font-face {
+  font-family: "Montserrat";
+  src: url("/fonts/montserrat-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
 @font-face {
   font-family: "Atkinson Hyperlegible Next";
   src: url("/fonts/atkinson-hyperlegible-next-latin-400-normal.woff2") format("woff2");
@@ -22,20 +29,29 @@
 }
 
 :root {
-  /* Surfaces and ink */
-  --canvas: #f1f3f0;
-  --surface: #ffffff;
-  --surface-sunken: #e8ebe7;
-  --ink: #151a21;
-  --ink-2: #414c58;
-  --ink-3: #5a6672;
-  --line: #d5dad5;
-  --line-strong: #7c8792;
+  /* Brand */
+  --brand: #2a7d2e;
+  --brand-deep: #123a17;
+  --brand-deep-hover: #1b4d21;
+  --brand-deep-line: #3a5e3e;
+  --on-brand-deep: #ffffff;
+  --on-brand-deep-2: #cfe3d1;
+  --on-brand-deep-3: #a9c9ad;
 
-  /* Action colour: biro blue */
-  --accent: #1e3a9a;
-  --accent-hover: #172d7a;
-  --accent-soft: #e6ebf8;
+  /* Surfaces and ink */
+  --canvas: #f2f5f1;
+  --surface: #ffffff;
+  --surface-sunken: #e7ece6;
+  --ink: #151a17;
+  --ink-2: #414c45;
+  --ink-3: #5a665e;
+  --line: #d3dbd2;
+  --line-strong: #7c8a7f;
+
+  /* Action colour */
+  --accent: var(--brand);
+  --accent-hover: #1f6223;
+  --accent-soft: #e6f2e7;
   --on-accent: #ffffff;
 
   /* Attendance marks. Each also carries a letter, never colour alone. */
@@ -53,6 +69,7 @@
 
   /* Type */
   --font: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Montserrat", var(--font);
   --text-xs: 0.8125rem;
   --text-sm: 0.9375rem;
   --text-md: 1rem;
